@@ -298,17 +298,73 @@ class Camt053Parser:
     def get_statement_info(self):
         """
         Extracts basic statement information like IBAN, opening, and closing balance.
-
+    
         Returns
         -------
         dict
-            A dictionary containing statement information.
+            A dictionary containing statement information including:
+            - IBAN: The account IBAN
+            - OpeningBalance: The opening balance amount
+            - ClosingBalance: The closing balance amount  
+            - OpeningBalanceDate: Date of the opening balance
+            - ClosingBalanceDate: Date of the closing balance
+            - Currency: Account currency (if available)
         """
         stmt = self.tree.find(".//Stmt", self.namespaces)
         if stmt is not None:
+            # Extract IBAN
             iban = stmt.find(".//Acct//Id//IBAN", self.namespaces)
             iban_text = iban.text if iban is not None else None
-            op_bal = stmt.find(".//Bal//Amt", self.namespaces)
-            op_bal_text = op_bal.text if op_bal is not None else None
-            return {"IBAN": iban_text, "OpeningBalance": op_bal_text}
+            
+            # Extract currency
+            currency = stmt.find(".//Acct//Ccy", self.namespaces)
+            currency_text = currency.text if currency is not None else None
+            
+            # Initialize result dictionary
+            result = {
+                "IBAN": iban_text,
+                "Currency": currency_text,
+                "OpeningBalance": None,
+                "ClosingBalance": None,
+                "OpeningBalanceDate": None,
+                "ClosingBalanceDate": None
+            }
+            
+            # Extract all balance elements
+            balance_elements = stmt.findall(".//Bal", self.namespaces)
+            
+            for balance_elem in balance_elements:
+                # Extract balance type (OPBD or CLBD)
+                balance_type_elem = balance_elem.find(".//Tp//CdOrPrtry//Cd", self.namespaces)
+                balance_type = balance_type_elem.text if balance_type_elem is not None else None
+                
+                # Extract amount
+                amount_elem = balance_elem.find(".//Amt", self.namespaces)
+                amount_text = amount_elem.text if amount_elem is not None else None
+                
+                # Extract credit/debit indicator
+                cdt_dbt_elem = balance_elem.find(".//CdtDbtInd", self.namespaces)
+                cdt_dbt_indicator = cdt_dbt_elem.text if cdt_dbt_elem is not None else None
+                
+                # Apply sign based on credit/debit indicator
+                if amount_text and cdt_dbt_indicator == "DBIT":
+                    try:
+                        amount_text = str(-float(amount_text))
+                    except ValueError:
+                        pass  # Keep original if conversion fails
+                
+                # Extract date
+                date_elem = balance_elem.find(".//Dt//Dt", self.namespaces)
+                date_text = date_elem.text if date_elem is not None else None
+                
+                # Store based on balance type
+                if balance_type == "OPBD":
+                    result["OpeningBalance"] = amount_text
+                    result["OpeningBalanceDate"] = date_text
+                elif balance_type == "CLBD":
+                    result["ClosingBalance"] = amount_text
+                    result["ClosingBalanceDate"] = date_text
+            
+            return result
+        
         return {}
