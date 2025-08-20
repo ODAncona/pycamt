@@ -30,7 +30,7 @@ pip install pycamt
 You can create an instance of the Camt053Parser by providing the XML data as a string:
 
 ```python
-from Camt053Parser import Camt053Parser
+from pycamt.parser import Camt053Parser
 
 xml_data = "<Document>...</Document>"  # Your CAMT.053 XML data as a string
 parser = Camt053Parser(xml_data)
