@@ -311,6 +311,10 @@ class Camt053Parser:
             - Currency: Account currency (if available)
         """
         stmt = self.tree.find(".//Stmt", self.namespaces)
+        if stmt is None:
+            # Maybe we have a Rpt file
+            stmt = self.tree.find(".//Rpt", self.namespaces)
+
         if stmt is not None:
             # Extract IBAN
             iban = stmt.find(".//Acct//Id//IBAN", self.namespaces)
