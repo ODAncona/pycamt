@@ -360,7 +360,11 @@ class Camt053Parser:
                 # Extract date
                 date_elem = balance_elem.find(".//Dt//Dt", self.namespaces)
                 date_text = date_elem.text if date_elem is not None else None
-                
+
+                date_time_elem = balance_elem.find(".//Dt//DtTm", self.namespaces)
+                if date_time_elem is not None:
+                    date_text = date_time_elem.text
+
                 # Store based on balance type
                 if balance_type == "OPBD":
                     result["OpeningBalance"] = amount_text
