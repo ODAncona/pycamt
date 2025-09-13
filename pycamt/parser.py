@@ -283,9 +283,19 @@ class Camt053Parser:
                 if tx_detail.find(".//RltdPties//Cdtr//Nm", self.namespaces) is not None
                 else None
             ),
+            "CreditorIBAN": (
+                tx_detail.find(".//RltdPties//CdtrAcct//Id//IBAN", self.namespaces).text
+                if tx_detail.find(".//RltdPties//CdtrAcct//Id//IBAN", self.namespaces) is not None
+                else None
+            ),
             "DebtorName": (
                 tx_detail.find(".//RltdPties//Dbtr//Nm", self.namespaces).text
                 if tx_detail.find(".//RltdPties//Dbtr//Nm", self.namespaces) is not None
+                else None
+            ),
+            "DebtorIBAN": (
+                tx_detail.find(".//RltdPties//DbtrAcct//Id//IBAN", self.namespaces).text
+                if tx_detail.find(".//RltdPties//DbtrAcct//Id//IBAN", self.namespaces) is not None
                 else None
             ),
             "PurposeCode": (
