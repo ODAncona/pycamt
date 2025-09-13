@@ -210,6 +210,7 @@ class Camt053Parser:
             A dictionary containing common data extracted from the entry.
         """
         return {
+            "TransactionID": entry.find(".//AcctSvcrRef", self.namespaces).text,
             "Amount": entry.find(".//Amt", self.namespaces).text,
             "Currency": entry.find(".//Amt", self.namespaces).attrib.get("Ccy"),
             "CreditDebitIndicator": entry.find(".//CdtDbtInd", self.namespaces).text,
@@ -262,7 +263,7 @@ class Camt053Parser:
             Detailed information extracted from the transaction detail element.
         """
 
-        return {
+        data = {
             "EndToEndId": (
                 tx_detail.find(".//Refs//EndToEndId", self.namespaces).text
                 if tx_detail.find(".//Refs//EndToEndId", self.namespaces) is not None
@@ -283,9 +284,24 @@ class Camt053Parser:
                 if tx_detail.find(".//RltdPties//Cdtr//Nm", self.namespaces) is not None
                 else None
             ),
+            "CreditorIBAN": (
+                tx_detail.find(".//RltdPties//CdtrAcct//Id//IBAN", self.namespaces).text
+                if tx_detail.find(".//RltdPties//CdtrAcct//Id//IBAN", self.namespaces) is not None
+                else None
+            ),
             "DebtorName": (
                 tx_detail.find(".//RltdPties//Dbtr//Nm", self.namespaces).text
                 if tx_detail.find(".//RltdPties//Dbtr//Nm", self.namespaces) is not None
+                else None
+            ),
+            "DebtorIBAN": (
+                tx_detail.find(".//RltdPties//DbtrAcct//Id//IBAN", self.namespaces).text
+                if tx_detail.find(".//RltdPties//DbtrAcct//Id//IBAN", self.namespaces) is not None
+                else None
+            ),
+            "PurposeCode": (
+                tx_detail.find(".//Purp//Cd", self.namespaces).text
+                if tx_detail.find(".//Purp//Cd", self.namespaces) is not None
                 else None
             ),
             "RemittanceInformation": (
@@ -294,6 +310,18 @@ class Camt053Parser:
                 else None
             ),
         }
+
+        structured_remittance_elem = tx_detail.find(".//RmtInf//Strd", self.namespaces)
+
+        if structured_remittance_elem is not None:
+            ref_elem = structured_remittance_elem.find(".//CdtrRefInf//Ref", self.namespaces)
+            additional_ref_elem = structured_remittance_elem.find(".//AddtlRmtInf", self.namespaces)
+
+            data["RemittanceInformation"] = ref_elem.text if ref_elem is not None else None
+            data["AdditionalRemittanceInformation"] = additional_ref_elem.text if additional_ref_elem is not None else None
+
+
+        return {key: value for key, value in data.items() if value is not None}
 
     def get_statement_info(self):
         """
@@ -360,7 +388,11 @@ class Camt053Parser:
                 # Extract date
                 date_elem = balance_elem.find(".//Dt//Dt", self.namespaces)
                 date_text = date_elem.text if date_elem is not None else None
-                
+
+                date_time_elem = balance_elem.find(".//Dt//DtTm", self.namespaces)
+                if date_time_elem is not None:
+                    date_text = date_time_elem.text
+
                 # Store based on balance type
                 if balance_type == "OPBD":
                     result["OpeningBalance"] = amount_text
