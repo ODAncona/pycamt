@@ -288,6 +288,11 @@ class Camt053Parser:
                 if tx_detail.find(".//RltdPties//Dbtr//Nm", self.namespaces) is not None
                 else None
             ),
+            "PurposeCode": (
+                tx_detail.find(".//Purp//Cd", self.namespaces).text
+                if tx_detail.find(".//Purp//Cd", self.namespaces) is not None
+                else None
+            ),
             "RemittanceInformation": (
                 tx_detail.find(".//RmtInf//Ustrd", self.namespaces).text
                 if tx_detail.find(".//RmtInf//Ustrd", self.namespaces) is not None
