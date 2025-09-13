@@ -210,6 +210,7 @@ class Camt053Parser:
             A dictionary containing common data extracted from the entry.
         """
         return {
+            "TransactionID": entry.find(".//AcctSvcrRef", self.namespaces).text,
             "Amount": entry.find(".//Amt", self.namespaces).text,
             "Currency": entry.find(".//Amt", self.namespaces).attrib.get("Ccy"),
             "CreditDebitIndicator": entry.find(".//CdtDbtInd", self.namespaces).text,
