@@ -295,6 +295,16 @@ class Camt053Parser:
             ),
         }
 
+        structured_remittance_elem = tx_detail.find(".//RmtInf//Strd", self.namespaces)
+
+        if structured_remittance_elem is not None:
+            ref_elem = structured_remittance_elem.find(".//CdtrRefInf//Ref", self.namespaces)
+            additional_ref_elem = structured_remittance_elem.find(".//AddtlRmtInf", self.namespaces)
+
+            data["RemittanceInformation"] = ref_elem.text if ref_elem is not None else None
+            data["AdditionalRemittanceInformation"] = additional_ref_elem.text if additional_ref_elem is not None else None
+
+
         return {key: value for key, value in data.items() if value is not None}
 
     def get_statement_info(self):
