@@ -262,7 +262,7 @@ class Camt053Parser:
             Detailed information extracted from the transaction detail element.
         """
 
-        return {
+        data = {
             "EndToEndId": (
                 tx_detail.find(".//Refs//EndToEndId", self.namespaces).text
                 if tx_detail.find(".//Refs//EndToEndId", self.namespaces) is not None
@@ -294,6 +294,8 @@ class Camt053Parser:
                 else None
             ),
         }
+
+        return {key: value for key, value in data.items() if value is not None}
 
     def get_statement_info(self):
         """
