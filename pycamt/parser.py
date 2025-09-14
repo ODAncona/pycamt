@@ -145,12 +145,16 @@ class Camt053Parser:
             A list of dictionaries, each representing a transaction with its associated data.
         """
         transactions = []
-        entries = self.tree.findall(".//Ntry", self.namespaces)
-        for entry in entries:
-            transactions.extend(self._extract_transaction(entry))
+        statements = self.tree.findall(".//Stmt", self.namespaces)
+
+        for statement in statements:
+            entries = statement.findall(".//Ntry", self.namespaces)
+            for entry in entries:
+                transactions.extend(self._extract_transaction(entry, statement))
+
         return transactions
 
-    def _extract_transaction(self, entry):
+    def _extract_transaction(self, entry, statement):
         """
         Extracts data from a single transaction entry.
 
@@ -165,7 +169,7 @@ class Camt053Parser:
             A dictionary containing extracted data for the transaction.
         """
 
-        common_data = self._extract_common_entry_data(entry)
+        common_data = self._extract_common_entry_data(entry, statement)
         entry_details = entry.findall(".//NtryDtls", self.namespaces)
 
         transactions = []
@@ -209,7 +213,7 @@ class Camt053Parser:
 
         return status
 
-    def _extract_common_entry_data(self, entry):
+    def _extract_common_entry_data(self, entry, statement):
         """
         Extracts common data applicable to all transactions within an entry.
 
@@ -225,6 +229,11 @@ class Camt053Parser:
         """
         return {
             "TransactionID": entry.find(".//AcctSvcrRef", self.namespaces).text,
+            "AccountIBAN": (
+                statement.find(".//Acct//Id//IBAN", self.namespaces).text
+                if statement.find(".//Acct//Id//IBAN", self.namespaces) is not None
+                else None
+            ),
             "Amount": entry.find(".//Amt", self.namespaces).text,
             "Currency": entry.find(".//Amt", self.namespaces).attrib.get("Ccy"),
             "CreditDebitIndicator": entry.find(".//CdtDbtInd", self.namespaces).text,
