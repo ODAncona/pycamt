@@ -1,7 +1,4 @@
-from io import StringIO
-
-from defusedxml import ElementTree as ET
-
+from lxml import etree as ET
 
 class Camt053Parser:
     """
@@ -31,7 +28,7 @@ class Camt053Parser:
         Extracts statement information like IBAN and balances from the CAMT.053 file.
     """
 
-    def __init__(self, xml_data):
+    def __init__(self, xml_data: str | bytes):
         """
         Initializes the Camt053Parser with XML data.
 
@@ -41,7 +38,7 @@ class Camt053Parser:
             XML data as a string representation of CAMT.053 content.
         """
         self.tree = ET.fromstring(xml_data)
-        self.namespaces = self._detect_namespaces(xml_data)
+        self.namespaces = self.tree.nsmap
         self.version = self._detect_version()
 
     @classmethod
@@ -59,28 +56,9 @@ class Camt053Parser:
         Camt053Parser
             An instance of the parser initialized with the XML content from the file.
         """
-        with open(file_path, encoding="utf-8") as file:
+        with open(file_path, 'rb') as file:
             xml_data = file.read()
         return cls(xml_data)
-
-    def _detect_namespaces(self, xml_data):
-        """
-        Detects and extracts namespaces from the XML data for XPath queries.
-
-        Parameters
-        ----------
-        xml_data : str
-            XML data from which namespaces are to be extracted.
-
-        Returns
-        -------
-        dict
-            A dictionary of namespace prefixes to namespace URIs.
-        """
-        namespaces = {}
-        for _, elem in ET.iterparse(StringIO(xml_data), events=("start-ns",)):
-            namespaces[elem[0]] = elem[1]
-        return namespaces
 
     def _detect_version(self):
         """
