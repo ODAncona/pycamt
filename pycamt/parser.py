@@ -356,12 +356,13 @@ class Camt053Parser:
             - ClosingBalanceDate: Date of the closing balance
             - Currency: Account currency (if available)
         """
-        stmt = self.tree.find(".//Stmt", self.namespaces)
-        if stmt is None:
+        statements = []
+        stmts = self.tree.findall(".//Stmt", self.namespaces)
+        if len(stmts) == 0:
             # Maybe we have a Rpt file
-            stmt = self.tree.find(".//Rpt", self.namespaces)
+            stmts = self.tree.findall(".//Rpt", self.namespaces)
 
-        if stmt is not None:
+        for stmt in stmts:
             # Extract IBAN
             iban = stmt.find(".//Acct//Id//IBAN", self.namespaces)
             iban_text = iban.text if iban is not None else None
@@ -419,6 +420,6 @@ class Camt053Parser:
                     result["ClosingBalance"] = amount_text
                     result["ClosingBalanceDate"] = date_text
             
-            return result
+            statements.append(result)
         
-        return {}
+        return statements
