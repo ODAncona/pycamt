@@ -96,6 +96,8 @@ class Camt053Parser:
             "camt.053.001.02",
             "camt.053.001.03",
             "camt.053.001.04",
+            "camt.053.001.08",
+            "camt.053.001.12",
         ]:
             if version in root.tag:
                 return version
@@ -195,6 +197,18 @@ class Camt053Parser:
                         )
         return transactions
 
+    def _parse_status(self, entry):
+        status = None
+        if entry is not None:
+            child_element = entry.find(".//Cd", self.namespaces)
+
+            if child_element is not None:
+                status = child_element.text
+            else:
+                status = entry.text
+
+        return status
+
     def _extract_common_entry_data(self, entry):
         """
         Extracts common data applicable to all transactions within an entry.
@@ -219,13 +233,9 @@ class Camt053Parser:
                 if entry.find(".//RvslInd", self.namespaces) is not None
                 else None
             ),
-            "Status": (
-                entry.find(".//Sts", self.namespaces).text
-                if entry.find(".//Sts", self.namespaces) is not None
-                else None
-            ),
-            "BookingDate": entry.find(".//BookgDt//Dt", self.namespaces).text,
-            "ValueDate": entry.find(".//ValDt//Dt", self.namespaces).text,
+            "Status": self._parse_status(entry=entry.find(".//Sts", self.namespaces)),
+            "BookingDate": entry.find(".//BookgDt//*", self.namespaces).text,
+            "ValueDate": entry.find(".//ValDt//*", self.namespaces).text,
             "BankTransactionCode": (
                 entry.find(".//BkTxCd//Domn//Cd", self.namespaces).text
                 if entry.find(".//BkTxCd//Domn//Cd", self.namespaces) is not None
@@ -319,7 +329,6 @@ class Camt053Parser:
 
             data["RemittanceInformation"] = ref_elem.text if ref_elem is not None else None
             data["AdditionalRemittanceInformation"] = additional_ref_elem.text if additional_ref_elem is not None else None
-
 
         return {key: value for key, value in data.items() if value is not None}
 
