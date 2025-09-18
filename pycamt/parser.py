@@ -306,6 +306,11 @@ class Camt053Parser:
                 if tx_detail.find(".//RmtInf//Ustrd", self.namespaces) is not None
                 else None
             ),
+            "RemittanceInformationFull": (
+                " ".join(rinfo.text.strip() for rinfo in tx_detail.findall(".//RmtInf//Ustrd", self.namespaces) if rinfo.text)
+                if tx_detail.findall(".//RmtInf//Ustrd", self.namespaces)
+                else None
+            ),
         }
 
         structured_remittance_elem = tx_detail.find(".//RmtInf//Strd", self.namespaces)
