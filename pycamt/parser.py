@@ -258,6 +258,9 @@ class Camt053Parser:
         -------
         dict
             Detailed information extracted from the transaction detail element.
+            Includes RemittanceInformation (first Ustrd) and RemittanceInformationFull 
+            (all Ustrd elements joined with spaces) for backward compatibility and 
+            comprehensive remittance data capture.
         """
 
         data = {
