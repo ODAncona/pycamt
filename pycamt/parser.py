@@ -258,6 +258,9 @@ class Camt053Parser:
         -------
         dict
             Detailed information extracted from the transaction detail element.
+            Includes RemittanceInformation (first Ustrd) and RemittanceInformationFull 
+            (all Ustrd elements joined with spaces) for backward compatibility and 
+            comprehensive remittance data capture.
         """
 
         data = {
@@ -304,6 +307,11 @@ class Camt053Parser:
             "RemittanceInformation": (
                 tx_detail.find(".//RmtInf//Ustrd", self.namespaces).text
                 if tx_detail.find(".//RmtInf//Ustrd", self.namespaces) is not None
+                else None
+            ),
+            "RemittanceInformationFull": (
+                " ".join(rinfo.text.strip() for rinfo in tx_detail.findall(".//RmtInf//Ustrd", self.namespaces) if rinfo.text)
+                if tx_detail.findall(".//RmtInf//Ustrd", self.namespaces)
                 else None
             ),
         }
