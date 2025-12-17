@@ -72,7 +72,8 @@ Then, install and activate the environment with:
 
 ```bash
 poetry install
-poetry shell
+poetry env activate
+eval $(poetry env activate)
 ```
 
 4. Install pre-commit to run linters/formatters at commit time:
