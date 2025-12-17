@@ -1,5 +1,6 @@
 from lxml import etree as ET
 
+
 class Camt053Parser:
     """
     A parser class for camt.053 XML files, designed to be flexible and extensible for different CAMT.053 versions.
@@ -56,7 +57,7 @@ class Camt053Parser:
         Camt053Parser
             An instance of the parser initialized with the XML content from the file.
         """
-        with open(file_path, 'rb') as file:
+        with open(file_path, "rb") as file:
             xml_data = file.read()
         return cls(xml_data)
 
@@ -158,9 +159,11 @@ class Camt053Parser:
         else:
             for ntry_detail in entry_details:
                 tx_details = ntry_detail.findall(".//TxDtls", self.namespaces)
-
+                if len(tx_details) == 0:
+                    # No TxDtls in NtryDtls
+                    transactions.append(common_data)
                 # Handle 1-1 relationship
-                if len(tx_details) == 1:
+                elif len(tx_details) == 1:
                     transactions.append(
                         {
                             **common_data,
@@ -315,21 +318,23 @@ class Camt053Parser:
             additional_ref_elem = structured_remittance_elem.find(".//AddtlRmtInf", self.namespaces)
 
             data["RemittanceInformation"] = ref_elem.text if ref_elem is not None else None
-            data["AdditionalRemittanceInformation"] = additional_ref_elem.text if additional_ref_elem is not None else None
+            data["AdditionalRemittanceInformation"] = (
+                additional_ref_elem.text if additional_ref_elem is not None else None
+            )
 
         return {key: value for key, value in data.items() if value is not None}
 
     def get_statement_info(self):
         """
         Extracts basic statement information like IBAN, opening, and closing balance.
-    
+
         Returns
         -------
         dict
             A dictionary containing statement information including:
             - IBAN: The account IBAN
             - OpeningBalance: The opening balance amount
-            - ClosingBalance: The closing balance amount  
+            - ClosingBalance: The closing balance amount
             - OpeningBalanceDate: Date of the opening balance
             - ClosingBalanceDate: Date of the closing balance
             - Currency: Account currency (if available)
@@ -344,11 +349,11 @@ class Camt053Parser:
             # Extract IBAN
             iban = stmt.find(".//Acct//Id//IBAN", self.namespaces)
             iban_text = iban.text if iban is not None else None
-            
+
             # Extract currency
             currency = stmt.find(".//Acct//Ccy", self.namespaces)
             currency_text = currency.text if currency is not None else None
-            
+
             # Initialize result dictionary
             result = {
                 "IBAN": iban_text,
@@ -356,32 +361,32 @@ class Camt053Parser:
                 "OpeningBalance": None,
                 "ClosingBalance": None,
                 "OpeningBalanceDate": None,
-                "ClosingBalanceDate": None
+                "ClosingBalanceDate": None,
             }
-            
+
             # Extract all balance elements
             balance_elements = stmt.findall(".//Bal", self.namespaces)
-            
+
             for balance_elem in balance_elements:
                 # Extract balance type (OPBD or CLBD)
                 balance_type_elem = balance_elem.find(".//Tp//CdOrPrtry//Cd", self.namespaces)
                 balance_type = balance_type_elem.text if balance_type_elem is not None else None
-                
+
                 # Extract amount
                 amount_elem = balance_elem.find(".//Amt", self.namespaces)
                 amount_text = amount_elem.text if amount_elem is not None else None
-                
+
                 # Extract credit/debit indicator
                 cdt_dbt_elem = balance_elem.find(".//CdtDbtInd", self.namespaces)
                 cdt_dbt_indicator = cdt_dbt_elem.text if cdt_dbt_elem is not None else None
-                
+
                 # Apply sign based on credit/debit indicator
                 if amount_text and cdt_dbt_indicator == "DBIT":
                     try:
                         amount_text = str(-float(amount_text))
                     except ValueError:
                         pass  # Keep original if conversion fails
-                
+
                 # Extract date
                 date_elem = balance_elem.find(".//Dt//Dt", self.namespaces)
                 date_text = date_elem.text if date_elem is not None else None
@@ -397,7 +402,7 @@ class Camt053Parser:
                 elif balance_type == "CLBD":
                     result["ClosingBalance"] = amount_text
                     result["ClosingBalanceDate"] = date_text
-            
+
             statements.append(result)
-        
+
         return statements

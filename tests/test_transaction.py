@@ -20,10 +20,6 @@ def parser():
       <Id>2025121402704522</Id>
       <ElctrncSeqNb>6</ElctrncSeqNb>
       <CreDtTm>2025-12-14T18:33:53</CreDtTm>
-      <FrToDt>
-        <FrDtTm>2024-12-13T00:00:00</FrDtTm>
-        <ToDtTm>2025-12-13T23:59:59</ToDtTm>
-      </FrToDt>
       <CpyDplctInd>DUPL</CpyDplctInd>
       <Acct>
         <Id>
@@ -44,118 +40,9 @@ def parser():
           </FinInstnId>
         </Svcr>
       </Acct>
-      <Bal>
-        <Tp>
-          <CdOrPrtry>
-            <Cd>OPBD</Cd>
-          </CdOrPrtry>
-        </Tp>
-        <Amt Ccy="CHF">5950.8</Amt>
-        <CdtDbtInd>CRDT</CdtDbtInd>
-        <Dt>
-          <Dt>2024-12-15</Dt>
-        </Dt>
-      </Bal>
-      <Bal>
-        <Tp>
-          <CdOrPrtry>
-            <Cd>CLBD</Cd>
-          </CdOrPrtry>
-        </Tp>
-        <Amt Ccy="CHF">4568.98</Amt>
-        <CdtDbtInd>CRDT</CdtDbtInd>
-        <Dt>
-          <Dt>2025-12-13</Dt>
-        </Dt>
-      </Bal>
-      <TxsSummry>
-        <TtlNtries>
-          <NbOfNtries>174</NbOfNtries>
-          <Sum>282567.72</Sum>
-          <TtlNetNtry>
-            <Amt>1381.82</Amt>
-            <CdtDbtInd>DBIT</CdtDbtInd>
-          </TtlNetNtry>
-        </TtlNtries>
-        <TtlCdtNtries>
-          <NbOfNtries>33</NbOfNtries>
-          <Sum>140592.95</Sum>
-        </TtlCdtNtries>
-        <TtlDbtNtries>
-          <NbOfNtries>141</NbOfNtries>
-          <Sum>141974.77</Sum>
-        </TtlDbtNtries>
-        <TtlNtriesPerBkTxCd>
-          <NbOfNtries>2</NbOfNtries>
-          <Sum>100</Sum>
-          <TtlNetNtry>
-            <Amt>100</Amt>
-            <CdtDbtInd>CRDT</CdtDbtInd>
-          </TtlNetNtry>
-          <BkTxCd>
-            <Domn>
-              <Cd>PMNT</Cd>
-              <Fmly>
-                <Cd>ICDT</Cd>
-                <SubFmlyCd>DAJT</SubFmlyCd>
-              </Fmly>
-            </Domn>
-          </BkTxCd>
-        </TtlNtriesPerBkTxCd>
-        <TtlNtriesPerBkTxCd>
-          <NbOfNtries>141</NbOfNtries>
-          <Sum>141974.77</Sum>
-          <TtlNetNtry>
-            <Amt>141974.77</Amt>
-            <CdtDbtInd>DBIT</CdtDbtInd>
-          </TtlNetNtry>
-          <BkTxCd>
-            <Domn>
-              <Cd>PMNT</Cd>
-              <Fmly>
-                <Cd>ICDT</Cd>
-                <SubFmlyCd>OTHR</SubFmlyCd>
-              </Fmly>
-            </Domn>
-          </BkTxCd>
-        </TtlNtriesPerBkTxCd>
-        <TtlNtriesPerBkTxCd>
-          <NbOfNtries>29</NbOfNtries>
-          <Sum>116207.75</Sum>
-          <TtlNetNtry>
-            <Amt>116207.75</Amt>
-            <CdtDbtInd>CRDT</CdtDbtInd>
-          </TtlNetNtry>
-          <BkTxCd>
-            <Domn>
-              <Cd>PMNT</Cd>
-              <Fmly>
-                <Cd>RCDT</Cd>
-                <SubFmlyCd>OTHR</SubFmlyCd>
-              </Fmly>
-            </Domn>
-          </BkTxCd>
-        </TtlNtriesPerBkTxCd>
-        <TtlNtriesPerBkTxCd>
-          <NbOfNtries>2</NbOfNtries>
-          <Sum>24285.2</Sum>
-          <TtlNetNtry>
-            <Amt>24285.2</Amt>
-            <CdtDbtInd>CRDT</CdtDbtInd>
-          </TtlNetNtry>
-          <BkTxCd>
-            <Domn>
-              <Cd>PMNT</Cd>
-              <Fmly>
-                <Cd>RCDT</Cd>
-                <SubFmlyCd>SALA</SubFmlyCd>
-              </Fmly>
-            </Domn>
-          </BkTxCd>
-        </TtlNtriesPerBkTxCd>
-      </TxsSummry>
+
       <Ntry>
-        <Amt Ccy="CHF">16458.75</Amt>
+        <Amt Ccy="CHF">12345.678</Amt>
         <CdtDbtInd>CRDT</CdtDbtInd>
         <RvslInd>false</RvslInd>
         <Sts>BOOK</Sts>
@@ -178,7 +65,7 @@ def parser():
         <NtryDtls>
           <Btch>
             <NbOfTxs>1</NbOfTxs>
-            <TtlAmt Ccy="CHF">16458.75</TtlAmt>
+            <TtlAmt Ccy="CHF">12345.678</TtlAmt>
             <CdtDbtInd>CRDT</CdtDbtInd>
           </Btch>
         </NtryDtls>
@@ -195,7 +82,7 @@ def parser():
         <ValDt>
           <Dt>2025-12-10</Dt>
         </ValDt>
-        <AcctSvcrRef>ZV20251211/127310</AcctSvcrRef>
+        <AcctSvcrRef>ZV20251201/127310</AcctSvcrRef>
         <BkTxCd>
           <Domn>
             <Cd>PMNT</Cd>
@@ -213,7 +100,7 @@ def parser():
           </Btch>
           <TxDtls>
             <Refs>
-              <AcctSvcrRef>ZV20251211/127310/1</AcctSvcrRef>
+              <AcctSvcrRef>ZV20251201/127310/1</AcctSvcrRef>
               <InstrId>0</InstrId>
               <EndToEndId>NOTPROVIDED</EndToEndId>
             </Refs>
@@ -237,12 +124,12 @@ def parser():
               </Cdtr>
             </RltdPties>
             <RmtInf>
-              <Ustrd>10.12.2025 16:54 KTP AU, AU Kartennummer: 535222******8761 </Ustrd>
+              <Ustrd>10.12.2025 16:00 Kartennummer: 1231456798 </Ustrd>
             </RmtInf>
-            <AddtlTxInf>Einkauf Debitkarte 10.12.2025 16:54 KTP AU, AU Kartennummer: 535222******8761</AddtlTxInf>
+            <AddtlTxInf>Einkauf Debitkarte 10.12.2025 16:00 Kartennummer: 1231456798</AddtlTxInf>
           </TxDtls>
         </NtryDtls>
-        <AddtlNtryInf>Einkauf Debitkarte 10.12.2025 16:54 KTP AU, AU Kartennummer: 535222******8761</AddtlNtryInf>
+        <AddtlNtryInf>Einkauf Debitkarte 10.12.2025 16:00 Kartennummer: 1231456798</AddtlNtryInf>
       </Ntry>
     </Stmt>
   </BkToCstmrStmt>
@@ -257,8 +144,16 @@ class TestTransactionCamt053Parser:
         assert len(transactions) == 2
         transaction = transactions[0]  # Access the first transaction
 
-        assert transaction["Amount"] == "500.00"
+        assert transaction["Amount"] == "12345.678"
         assert transaction["Currency"] == "CHF"
         assert transaction["CreditDebitIndicator"] == "CRDT"
-        assert transaction["BookingDate"] == "2020-06-23"
-        assert transaction["ValueDate"] == "2020-06-23"
+        assert transaction["BookingDate"] == "2025-11-25"
+        assert transaction["ValueDate"] == "2025-11-25"
+
+        transaction = transactions[1]  # Access the 2nd transaction
+
+        assert transaction["Amount"] == "123.2"
+        assert transaction["Currency"] == "CHF"
+        assert transaction["CreditDebitIndicator"] == "DBIT"
+        assert transaction["BookingDate"] == "2025-12-11"
+        assert transaction["ValueDate"] == "2025-12-10"
