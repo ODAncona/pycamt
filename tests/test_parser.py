@@ -79,12 +79,14 @@ class TestCamt053Parser:
         assert transaction["ValueDate"] == "2020-06-23"
 
     def test_get_statement_info(self, parser):
-        expected = [{
-            "IBAN": "GB33BUKB20201555555555",
-            "OpeningBalance": "1000.00",
-            "Currency": None,
-            "ClosingBalance": None,
-            "OpeningBalanceDate": "2025-07-31",
-            "ClosingBalanceDate": None
-        }]
+        expected = [
+            {
+                "IBAN": "GB33BUKB20201555555555",
+                "OpeningBalance": "1000.00",
+                "Currency": None,
+                "ClosingBalance": None,
+                "OpeningBalanceDate": "2025-07-31",
+                "ClosingBalanceDate": None,
+            }
+        ]
         assert parser.get_statement_info() == expected
