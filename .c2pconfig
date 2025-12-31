@@ -1,5 +1,5 @@
 default_output = "clipboard"
-include_patterns = ["*.py", "*.ini", "*.toml", "Makefile"]
-exclude_patterns = []
+include_patterns = ["*.py", "*.ini", "*.toml", "Makefile","*.yml"]
+exclude_patterns = ["*node_modules/**", "LICENSE","*.lock"]
 line_numbers = false
 absolute_path = false

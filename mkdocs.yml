@@ -5,7 +5,7 @@ site_description: Pycamt is a flexible and extensible Python class designed to p
 site_author: Olivier D'Ancona
 edit_uri: edit/main/docs/
 repo_name: ODAncona/pycamt
-copyright: Maintained by <a href="https://ODAncona.com">Florian</a>.
+copyright: Maintained by <a href="https://github.com/ODAncona">Olivier D'Ancona</a>.
 
 nav:
   - Home: index.md
