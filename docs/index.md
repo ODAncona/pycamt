@@ -61,6 +61,12 @@ for transaction in transactions:
     print(transaction)
 ```
 
+**Note**: Each transaction includes remittance information in two fields:
+- `RemittanceInformation`: Contains only the first unstructured remittance line
+- `RemittanceInformationFull`: Contains all unstructured remittance lines joined with spaces
+
+This is particularly useful for international transactions that may contain multiple lines of remittance information.
+
 ### Extracting Statement Information
 
 To get basic statement information like IBAN and opening/closing balance:
