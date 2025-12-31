@@ -141,13 +141,13 @@ class TestCamt053Parser:
         """
         parser = Camt053Parser(xml_data)
         transactions = parser.get_transactions()
-        
+
         assert len(transactions) == 1
         transaction = transactions[0]
-        
+
         # Current behavior: only first Ustrd element
         assert transaction["RemittanceInformation"] == "Ref..      1234567890123456"
-        
+
         # New behavior: all Ustrd elements joined
         expected_full = (
             "Ref..      1234567890123456 Betrag EUR            69,06 "
@@ -200,10 +200,10 @@ class TestCamt053Parser:
         """
         parser = Camt053Parser(xml_data)
         transactions = parser.get_transactions()
-        
+
         assert len(transactions) == 1
         transaction = transactions[0]
-        
+
         # Both fields should have the same value for single Ustrd
         assert transaction["RemittanceInformation"] == "Single remittance info"
         assert transaction["RemittanceInformationFull"] == "Single remittance info"
@@ -247,10 +247,10 @@ class TestCamt053Parser:
         """
         parser = Camt053Parser(xml_data)
         transactions = parser.get_transactions()
-        
+
         assert len(transactions) == 1
         transaction = transactions[0]
-        
+
         # Both fields should be None when no remittance info exists
         assert "RemittanceInformation" not in transaction  # Filtered out by return statement
         assert "RemittanceInformationFull" not in transaction  # Filtered out by return statement

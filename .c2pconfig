@@ -1,0 +1,5 @@
+default_output = "clipboard"
+include_patterns = ["*.py", "*.ini", "*.toml", "Makefile"]
+exclude_patterns = []
+line_numbers = false
+absolute_path = false

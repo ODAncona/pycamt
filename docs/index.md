@@ -62,6 +62,7 @@ for transaction in transactions:
 ```
 
 **Note**: Each transaction includes remittance information in two fields:
+
 - `RemittanceInformation`: Contains only the first unstructured remittance line
 - `RemittanceInformationFull`: Contains all unstructured remittance lines joined with spaces
 
@@ -85,5 +86,7 @@ Contributions to Camt053Parser are welcome! If you have suggestions for improvem
 For submitting enhancements or new features, please ensure your code is well-documented and includes relevant docstrings.
 Ensure your contributions are tested to maintain reliability and stability of the parser.
 Adhere to the existing code style for consistency.
-License
-Specify your chosen license here, providing users with information on how they can use, modify, and share your code.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

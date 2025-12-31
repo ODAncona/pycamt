@@ -1,3 +1,6 @@
+import contextlib
+from pathlib import Path
+
 from lxml import etree as ET
 
 
@@ -38,12 +41,13 @@ class Camt053Parser:
         xml_data : str
             XML data as a string representation of CAMT.053 content.
         """
-        self.tree = ET.fromstring(xml_data)
+        parser = ET.XMLParser(resolve_entities=False, no_network=True)
+        self.tree = ET.fromstring(xml_data, parser=parser)
         self.namespaces = self.tree.nsmap
         self.version = self._detect_version()
 
     @classmethod
-    def from_file(cls, file_path):
+    def from_file(cls, file_path: str | Path):
         """
         Creates an instance of Camt053Parser from a CAMT.053 XML file.
 
@@ -58,8 +62,7 @@ class Camt053Parser:
             An instance of the parser initialized with the XML content from the file.
         """
         with open(file_path, "rb") as file:
-            xml_data = file.read()
-        return cls(xml_data)
+            return cls(file.read())
 
     def _detect_version(self):
         """
@@ -164,33 +167,25 @@ class Camt053Parser:
                     transactions.append(common_data)
                 # Handle 1-1 relationship
                 elif len(tx_details) == 1:
-                    transactions.append(
-                        {
-                            **common_data,
-                            **self._extract_transaction_details(tx_details[0]),
-                        }
-                    )
+                    transactions.append({
+                        **common_data,
+                        **self._extract_transaction_details(tx_details[0]),
+                    })
 
                 # Handle 1-n relationship
                 else:
                     for tx_detail in tx_details:
-                        transactions.append(
-                            {
-                                **common_data,
-                                **self._extract_transaction_details(tx_detail),
-                            }
-                        )
+                        transactions.append({
+                            **common_data,
+                            **self._extract_transaction_details(tx_detail),
+                        })
         return transactions
 
     def _parse_status(self, entry):
         status = None
         if entry is not None:
             child_element = entry.find(".//Cd", self.namespaces)
-
-            if child_element is not None:
-                status = child_element.text
-            else:
-                status = entry.text
+            status = child_element.text if child_element is not None else entry.text
 
         return status
 
@@ -261,8 +256,8 @@ class Camt053Parser:
         -------
         dict
             Detailed information extracted from the transaction detail element.
-            Includes RemittanceInformation (first Ustrd) and RemittanceInformationFull 
-            (all Ustrd elements joined with spaces) for backward compatibility and 
+            Includes RemittanceInformation (first Ustrd) and RemittanceInformationFull
+            (all Ustrd elements joined with spaces) for backward compatibility and
             comprehensive remittance data capture.
         """
 
@@ -313,7 +308,9 @@ class Camt053Parser:
                 else None
             ),
             "RemittanceInformationFull": (
-                " ".join(rinfo.text.strip() for rinfo in tx_detail.findall(".//RmtInf//Ustrd", self.namespaces) if rinfo.text)
+                " ".join(
+                    rinfo.text.strip() for rinfo in tx_detail.findall(".//RmtInf//Ustrd", self.namespaces) if rinfo.text
+                )
                 if tx_detail.findall(".//RmtInf//Ustrd", self.namespaces)
                 else None
             ),
@@ -390,10 +387,8 @@ class Camt053Parser:
 
                 # Apply sign based on credit/debit indicator
                 if amount_text and cdt_dbt_indicator == "DBIT":
-                    try:
+                    with contextlib.suppress(ValueError):
                         amount_text = str(-float(amount_text))
-                    except ValueError:
-                        pass  # Keep original if conversion fails
 
                 # Extract date
                 date_elem = balance_elem.find(".//Dt//Dt", self.namespaces)
