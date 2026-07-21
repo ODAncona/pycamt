@@ -1,6 +1,6 @@
 [project]
 name = "pycamt"
-version = "0.2.0"
+version = "1.1.0"
 description = "Camt053Parser is a flexible and extensible Python class designed to parse CAMT.053 XML files, which are used for bank-to-customer account report messages in the financial industry. The parser supports multiple versions of the CAMT.053 standard, making it a versatile tool for extracting financial transaction data."
 authors = [
   { name = "Olivier D'Ancona", email = "folivier_dancona@hotmail.com" },
