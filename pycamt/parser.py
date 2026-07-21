@@ -5,7 +5,7 @@ from lxml import etree as ET
 
 
 class Camt053ParseError(Exception):
-    pass
+    """Raised when the CAMT.053/CAMT.052 document structure cannot be parsed."""
 
 
 class Camt053Parser:
@@ -241,6 +241,35 @@ class Camt053Parser:
 
         return status
 
+    def _find_text(self, element, xpath):
+        """
+        Safely extracts the text content of a child element, returning None
+        if the element (or the child matched by xpath) is missing.
+
+        This is the central safety-net used to protect the parser against
+        real-world CAMT.053 files where elements considered "usually
+        present" (e.g. AcctSvcrRef, BookgDt, Amt) are, according to the
+        ISO 20022 schema, actually optional (cardinality 0..1) and can be
+        legitimately absent for certain entries (year-end interest,
+        internal adjustments, some card/e-banking postings, etc.).
+
+        Parameters
+        ----------
+        element : Element or None
+            The XML element to search within. If None, None is returned.
+        xpath : str
+            The XPath expression used to find the target child element.
+
+        Returns
+        -------
+        str or None
+            The text content of the matched element, or None if not found.
+        """
+        if element is None:
+            return None
+        found = element.find(xpath, self.namespaces)
+        return found.text if found is not None else None
+
     def _extract_common_entry_data(self, entry, statement):
         """
         Extracts common data applicable to all transactions within an entry.
@@ -255,44 +284,22 @@ class Camt053Parser:
         dict
             A dictionary containing common data extracted from the entry.
         """
+        amt_elem = entry.find(".//Amt", self.namespaces)
+
         return {
-            "TransactionID": entry.find(".//AcctSvcrRef", self.namespaces).text,
-            "AccountIBAN": (
-                statement.find(".//Acct//Id//IBAN", self.namespaces).text
-                if statement.find(".//Acct//Id//IBAN", self.namespaces) is not None
-                else None
-            ),
-            "Amount": entry.find(".//Amt", self.namespaces).text,
-            "Currency": entry.find(".//Amt", self.namespaces).attrib.get("Ccy"),
-            "CreditDebitIndicator": entry.find(".//CdtDbtInd", self.namespaces).text,
-            "ReversalIndicator": (
-                entry.find(".//RvslInd", self.namespaces).text
-                if entry.find(".//RvslInd", self.namespaces) is not None
-                else None
-            ),
+            "TransactionID": self._find_text(entry, ".//AcctSvcrRef"),
+            "AccountIBAN": self._find_text(statement, ".//Acct//Id//IBAN"),
+            "Amount": amt_elem.text if amt_elem is not None else None,
+            "Currency": amt_elem.attrib.get("Ccy") if amt_elem is not None else None,
+            "CreditDebitIndicator": self._find_text(entry, ".//CdtDbtInd"),
+            "ReversalIndicator": self._find_text(entry, ".//RvslInd"),
             "Status": self._parse_status(entry=entry.find(".//Sts", self.namespaces)),
-            "BookingDate": entry.find(".//BookgDt//*", self.namespaces).text,
-            "ValueDate": entry.find(".//ValDt//*", self.namespaces).text,
-            "BankTransactionCode": (
-                entry.find(".//BkTxCd//Domn//Cd", self.namespaces).text
-                if entry.find(".//BkTxCd//Domn//Cd", self.namespaces) is not None
-                else None
-            ),
-            "TransactionFamilyCode": (
-                entry.find(".//BkTxCd//Domn//Fmly//Cd", self.namespaces).text
-                if entry.find(".//BkTxCd//Domn//Fmly//Cd", self.namespaces) is not None
-                else None
-            ),
-            "TransactionSubFamilyCode": (
-                entry.find(".//BkTxCd//Domn//Fmly//SubFmlyCd", self.namespaces).text
-                if entry.find(".//BkTxCd//Domn//Fmly//SubFmlyCd", self.namespaces) is not None
-                else None
-            ),
-            "AdditionalEntryInformation": (
-                entry.find(".//AddtlNtryInf", self.namespaces).text
-                if entry.find(".//AddtlNtryInf", self.namespaces) is not None
-                else None
-            ),
+            "BookingDate": self._find_text(entry, ".//BookgDt//*"),
+            "ValueDate": self._find_text(entry, ".//ValDt//*"),
+            "BankTransactionCode": self._find_text(entry, ".//BkTxCd//Domn//Cd"),
+            "TransactionFamilyCode": self._find_text(entry, ".//BkTxCd//Domn//Fmly//Cd"),
+            "TransactionSubFamilyCode": self._find_text(entry, ".//BkTxCd//Domn//Fmly//SubFmlyCd"),
+            "AdditionalEntryInformation": self._find_text(entry, ".//AddtlNtryInf"),
         }
 
     def _extract_transaction_details(self, tx_detail):
