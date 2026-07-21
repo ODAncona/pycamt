@@ -21,7 +21,7 @@ jobs:
 
       - name: Build and publish
         run: |
-          uv version $RELEASE_VERSION pyproject.toml
+          uv version $RELEASE_VERSION
           make build-and-publish
         env:
           PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
