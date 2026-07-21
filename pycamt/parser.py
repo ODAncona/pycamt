@@ -103,7 +103,7 @@ class Camt053Parser:
             if len(stmts) != 0:
                 return stmts
 
-        raise Camt053ParseError("Neither 'Stmt' nor 'Rpt' element found")
+        raise Camt053ParseError()
 
     def get_group_header(self):
         """
@@ -156,49 +156,82 @@ class Camt053Parser:
         return transactions
 
     def _extract_transaction(self, entry, statement):
-        """
-        Extracts data from a single transaction entry.
-
-        Parameters
-        ----------
-        entry : Element
-            The XML element representing a transaction entry.
-
-        Returns
-        -------
-        dict
-            A dictionary containing extracted data for the transaction.
-        """
-
         common_data = self._extract_common_entry_data(entry, statement)
         entry_details = entry.findall(".//NtryDtls", self.namespaces)
 
-        transactions = []
-
-        # Handle 1-0 relationship
+        # 1-0 relationship : Aucun détail
         if not entry_details:
-            transactions.append(common_data)
-        else:
-            for ntry_detail in entry_details:
-                tx_details = ntry_detail.findall(".//TxDtls", self.namespaces)
-                if len(tx_details) == 0:
-                    # No TxDtls in NtryDtls
-                    transactions.append(common_data)
-                # Handle 1-1 relationship
-                elif len(tx_details) == 1:
-                    transactions.append({
-                        **common_data,
-                        **self._extract_transaction_details(tx_details[0]),
-                    })
+            return [common_data]
 
-                # Handle 1-n relationship
-                else:
-                    for tx_detail in tx_details:
-                        transactions.append({
-                            **common_data,
-                            **self._extract_transaction_details(tx_detail),
-                        })
+        transactions = []
+        has_tx_details = False
+
+        for ntry_detail in entry_details:
+            tx_details = ntry_detail.findall(".//TxDtls", self.namespaces)
+
+            for tx_detail in tx_details:
+                has_tx_details = True
+                tx_data = self._extract_transaction_details(tx_detail)
+
+                # SÉCURITÉ : Vérifier si le détail a son propre indicateur CRDT/DBIT
+                detail_cdt_dbt = tx_detail.find(".//CdtDbtInd", self.namespaces)
+                if detail_cdt_dbt is not None:
+                    tx_data["CreditDebitIndicator"] = detail_cdt_dbt.text
+
+                merged_data = {**common_data, **tx_data}
+                transactions.append(merged_data)
+
+        # Si on a parcouru des NtryDtls mais qu'aucun ne contenait de TxDtls,
+        # on ajoute la transaction principale UNE SEULE FOIS pour éviter les doublons.
+        if not has_tx_details:
+            return [common_data]
+
         return transactions
+
+    # def _extract_transaction(self, entry, statement):
+    #     """
+    #     Extracts data from a single transaction entry.
+
+    #     Parameters
+    #     ----------
+    #     entry : Element
+    #         The XML element representing a transaction entry.
+
+    #     Returns
+    #     -------
+    #     dict
+    #         A dictionary containing extracted data for the transaction.
+    #     """
+
+    #     common_data = self._extract_common_entry_data(entry, statement)
+    #     entry_details = entry.findall(".//NtryDtls", self.namespaces)
+
+    #     transactions = []
+
+    #     # Handle 1-0 relationship
+    #     if not entry_details:
+    #         transactions.append(common_data)
+    #     else:
+    #         for ntry_detail in entry_details:
+    #             tx_details = ntry_detail.findall(".//TxDtls", self.namespaces)
+    #             if len(tx_details) == 0:
+    #                 # No TxDtls in NtryDtls
+    #                 transactions.append(common_data)
+    #             # Handle 1-1 relationship
+    #             elif len(tx_details) == 1:
+    #                 transactions.append({
+    #                     **common_data,
+    #                     **self._extract_transaction_details(tx_details[0]),
+    #                 })
+
+    #             # Handle 1-n relationship
+    #             else:
+    #                 for tx_detail in tx_details:
+    #                     transactions.append({
+    #                         **common_data,
+    #                         **self._extract_transaction_details(tx_detail),
+    #                     })
+    #     return transactions
 
     def _parse_status(self, entry):
         status = None
